@@ -8,7 +8,7 @@ WORKERS=[Worker(i,n,frozenset(r),{d:[(8,23)] for d in range(7)},max_hours=40,ope
 NEEDS=[Need(d,r,12,16,1) for d in range(7) for r in ["Caja","Cocina","Servicio"]]+[Need(d,"Limpieza",16,20,1) for d in range(7)]
 @app.get("/",response_class=HTMLResponse)
 def home(request:Request):
- result=generate_schedule(WORKERS,NEEDS); return templates.TemplateResponse("index.html",{"request":request,"workers":WORKERS,"result":result,"days":["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"]})
+ result=generate_schedule(WORKERS,NEEDS); return templates.TemplateResponse(request=request,name="index.html",context={"workers":WORKERS,"result":result,"days":["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"]})
 @app.post("/generate")
 def generate(): return RedirectResponse("/",status_code=303)
 @app.post("/employees")
