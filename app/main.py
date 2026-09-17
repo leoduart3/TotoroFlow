@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from .scheduler import *
 from .db import *
-app=FastAPI(title="RosterFlow"); templates=Jinja2Templates(directory="app/templates")
+app=FastAPI(title="RosterFlow"); templates=Jinja2Templates(directory="app/templates"); app.mount("/static", StaticFiles(directory="app/static"), name="static")
 DEMO=[( "Ana Torres",["Caja"]),("Bruno Silva",["Caja","Servicio"]),("Carla Méndez",["Cocina"]),("Diego Rojas",["Cocina"]),("Elena Paz",["Servicio"]),("Fabián Núñez",["Servicio","Bartender"]),("Gina Vera",["Limpieza"]),("Hugo Sosa",["Supervisor","Caja"]),("Iris Benítez",["Cocina","Limpieza"]),("Julián Acosta",["Servicio"]),("Karen Ortiz",["Cocina"]),("Leo Giménez",["Limpieza","Servicio"])]
 def seed():
  init_db(); db=session()
@@ -20,7 +21,7 @@ def worker_models(db):
  return [Worker(e.id,e.name,frozenset(e.roles),{int(k):[tuple(x) for x in v] for k,v in e.availability.items()},e.max_hours,e.opening,e.closing) for e in db.query(Employee).all()]
 @app.get("/",response_class=HTMLResponse)
 def home(request:Request):
- db=session(); employees=db.query(Employee).all(); needs=db.query(OperationalNeed).all(); result=generate_schedule(worker_models(db),[Need(n.day,n.role,n.start,n.end,n.minimum) for n in needs]); return templates.TemplateResponse(request=request,name="dashboard.html",context={"workers":employees,"result":result,"days":["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"]})
+ db=session(); employees=db.query(Employee).all(); needs=db.query(OperationalNeed).all(); result=generate_schedule(worker_models(db),[Need(n.day,n.role,n.start,n.end,n.minimum) for n in needs]); return templates.TemplateResponse(request=request,name="app.html",context={"workers":employees,"needs":needs,"result":result,"days":["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"]})
 @app.post("/generate")
 def generate():
  db=session(); result=generate_schedule(worker_models(db),[Need(n.day,n.role,n.start,n.end,n.minimum) for n in db.query(OperationalNeed).all()]); schedule=SavedSchedule(status="generated" if result.feasible else "infeasible"); db.add(schedule); db.flush()
