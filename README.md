@@ -1,6 +1,6 @@
-# RosterFlow
+# TotoroFlow
 
-RosterFlow es un roster semanal para restaurantes medianos. Modela empleados, roles, disponibilidad y cobertura, y usa **Google OR-Tools CP-SAT** para encontrar asignaciones válidas.
+TotoroFlow es un roster semanal para restaurantes medianos. Modela empleados, roles, disponibilidad y cobertura, y usa **Google OR-Tools CP-SAT** para encontrar asignaciones válidas.
 
 ## Ejecutar
 
