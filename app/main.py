@@ -39,3 +39,26 @@ def delete_employee(employee_id:int):
  db=session(); e=db.get(Employee,employee_id)
  if e: db.delete(e); db.commit()
  db.close(); return RedirectResponse("/",status_code=303)
+@app.post("/needs")
+def add_need(day:int=Form(...),role:str=Form(...),start:int=Form(...),end:int=Form(...),minimum:int=Form(1)):
+ db=session(); db.add(OperationalNeed(day=day,role=role,start=start,end=end,minimum=minimum)); db.commit(); db.close(); return RedirectResponse("/",status_code=303)
+@app.post("/needs/{need_id}/edit")
+def edit_need(need_id:int,day:int=Form(...),role:str=Form(...),start:int=Form(...),end:int=Form(...),minimum:int=Form(1)):
+ db=session(); n=db.get(OperationalNeed,need_id)
+ if not n: raise HTTPException(404,"Need not found")
+ n.day=day; n.role=role; n.start=start; n.end=end; n.minimum=minimum; db.commit(); db.close(); return RedirectResponse("/",status_code=303)
+@app.post("/needs/{need_id}/delete")
+def delete_need(need_id:int):
+ db=session(); n=db.get(OperationalNeed,need_id)
+ if n: db.delete(n); db.commit()
+ db.close(); return RedirectResponse("/",status_code=303)
+@app.post("/assignments/{assignment_id}/edit")
+def edit_assignment(assignment_id:int,employee_id:int=Form(...),day:int=Form(...),role:str=Form(...),start:int=Form(...),end:int=Form(...)):
+ db=session(); a=db.get(AssignmentRow,assignment_id)
+ if not a: raise HTTPException(404,"Assignment not found")
+ a.employee_id=employee_id; a.day=day; a.role=role; a.start=start; a.end=end; db.commit(); db.close(); return RedirectResponse("/",status_code=303)
+@app.post("/assignments/{assignment_id}/delete")
+def delete_assignment(assignment_id:int):
+ db=session(); a=db.get(AssignmentRow,assignment_id)
+ if a: db.delete(a); db.commit()
+ db.close(); return RedirectResponse("/",status_code=303)
